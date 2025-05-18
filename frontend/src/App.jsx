@@ -8,15 +8,15 @@ import Footer from './Components/Footer';
 
 const App = () => {
 
-  const {user,isLoaded,isSignedIn} = useUser()
-  const navigate = useNavigate();
-  console.log(user)
+  // const {user,isLoaded,isSignedIn} = useUser()
+  // const navigate = useNavigate();
+  // console.log(user)
 
-  useEffect(()=>{
-    if(isLoaded && !isSignedIn){
-      navigate('/login')
-    }
-  },[isLoaded,isSignedIn])
+  // useEffect(()=>{
+  //   if(isLoaded && !isSignedIn){
+  //     navigate('/login')
+  //   }
+  // },[isLoaded,isSignedIn])
 
   return (
 
