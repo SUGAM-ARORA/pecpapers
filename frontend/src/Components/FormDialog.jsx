@@ -87,7 +87,7 @@ export default function FormDialog() {
         open={open}
         onClose={handleClose}
       >
-        <form className='flex flex-col gap-5 m-5 w-[60vh]' onSubmit={handleSubmit}>
+        <form className='flex flex-col gap-5 m-5 ' onSubmit={handleSubmit}>
           <FormControl>
             <Typography fontSize={25} >Upload a Paper</Typography>
             <div >
