@@ -27,8 +27,8 @@ const Browse = () => {
     semester: ''
   });
 
-  const [papersToDisplay, setPapersToDisplay] = useState(null);
-  const [papersFetched, setPapersFetched] = useState(null);
+  const [papersToDisplay, setPapersToDisplay] = useState([]);
+  const [papersFetched, setPapersFetched] = useState([]);
   const [activeFilters, setActiveFilters] = useState([]);
 
   const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
@@ -37,10 +37,13 @@ const Browse = () => {
     try {
       setLoading(true);
       const response = await axios.get(`${BACKEND_URL}/getallpapers/`);
-      setPapersFetched(response.data);
-      setPapersToDisplay(response.data);
+      const papers = Array.isArray(response.data) ? response.data : [];
+      setPapersFetched(papers);
+      setPapersToDisplay(papers);
     } catch (error) {
       console.error(error);
+      setPapersFetched([]);
+      setPapersToDisplay([]);
     } finally {
       setLoading(false);
     }
@@ -51,7 +54,7 @@ const Browse = () => {
   }, [BACKEND_URL]);
 
   const handleSearch = () => {
-    if (!papersFetched) return;
+    if (!Array.isArray(papersFetched)) return;
     
     const filtered = papersFetched.filter(paper =>
       paper.subjectName.toLowerCase().includes(searchValue.toLowerCase()) ||
@@ -64,7 +67,7 @@ const Browse = () => {
   };
 
   const handleFilter = () => {
-    if (!papersFetched) return;
+    if (!Array.isArray(papersFetched)) return;
 
     const newFilters = [];
     if (filters.department) newFilters.push(`Department: ${filters.department}`);
@@ -82,7 +85,7 @@ const Browse = () => {
   };
 
   const handleSort = () => {
-    if (!papersToDisplay) return;
+    if (!Array.isArray(papersToDisplay)) return;
     
     const sorted = [...papersToDisplay].sort((a, b) => {
       if (sortOrder === 'newest') {
@@ -233,7 +236,7 @@ const Browse = () => {
                 <SearchIcon className="text-4xl text-gray-400" />
               </motion.div>
             </div>
-          ) : papersToDisplay && papersToDisplay.length > 0 ? (
+          ) : Array.isArray(papersToDisplay) && papersToDisplay.length > 0 ? (
             <AnimatePresence>
               <div className="grid gap-4">
                 {papersToDisplay.map((paper, index) => (
