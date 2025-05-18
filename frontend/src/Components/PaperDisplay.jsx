@@ -18,7 +18,11 @@ const PaperDisplay = ({ paper }) => {
                 <a href={paper.cloudUrl} download={`${paper.semester}th sem ${paper.subjectName} ${paper.examType}`} target='_blank' rel="noopener noreferrer">
                     <IoMdDownload size={25} />
                 </a>
+                <a href={paper.cloudUrl} download={`${paper.semester}th sem ${paper.subjectName} ${paper.examType}`} target='_blank' rel="noopener noreferrer">
                 <FaEye size={25} />
+                </a>
+
+                
             </div>
 
         </div>

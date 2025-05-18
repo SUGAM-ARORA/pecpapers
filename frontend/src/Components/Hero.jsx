@@ -26,12 +26,15 @@ const Hero = () => {
 
     return (
         <>
-            <div className='flex flex-col items-center mt-5'>
+            <div className='flex flex-col items-center m-5'>
                 <Card variant="outlined" sx={
                     {
                         backgroundColor: '#EEEEEE',
                         borderRadius: '5px',
-                        width: '75vh',
+                        // width: {
+                        //     md: '75vh',
+                        //     sm: 'vh'
+                        // },
                         padding: '1vh'
                     }
                 }>
@@ -65,7 +68,7 @@ const Hero = () => {
             <div className='m-5 mt-10 flex flex-col'>
                 <span className='text-4xl font-bold'>Thanks to the OG's </span>
                 <div className='flex flex-col items-center'>
-                    <div className='flex flex-row justify-between  w-[90vh]'>
+                    <div className='flex flex-row justify-between'>
                         <div className='flex flex-col items-center'>
                             <img src={gitimg} alt="" className='h-[150px] w-[150px]' />
                             <span>PEC-CSS/PEC-Previous-Year-Papers</span>

@@ -3,10 +3,11 @@ import SearchIcon from '@mui/icons-material/Search';
 import { styled, alpha } from '@mui/material/styles';
 import InputBase from '@mui/material/InputBase';
 import { Button, FormControl, Select, MenuItem } from '@mui/material';
-import { departments,examType } from '../utils/constants';
+import { departments, examType } from '../utils/constants';
 import axios from 'axios';
 import PaperDisplay from '../Components/PaperDisplay';
 import { useUser } from '@clerk/clerk-react';
+import {InfinitySpin} from 'react-loader-spinner'
 
 const Search = styled('div')(({ theme }) => ({
   position: 'relative',
@@ -57,8 +58,8 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 
 const Browse = () => {
 
-  const {isSignedIn} = useUser()
-  const [loading,setLoading] = useState(false)
+  const { isSignedIn } = useUser()
+  const [loading, setLoading] = useState(false)
 
   const [searchValue, setSearchValue] = useState('');
   const semesters = [1, 2, 3, 4, 5, 6, 7, 8]
@@ -66,20 +67,22 @@ const Browse = () => {
   const [exam, setExam] = React.useState('')
   const [sem, setSem] = React.useState('')
 
-  const [papersToDisplay,setPapersToDisplay] = useState(null);
-  const [papersFetched,setPapersFetched] = useState(null);
+  const [papersToDisplay, setPapersToDisplay] = useState(null);
+  const [papersFetched, setPapersFetched] = useState(null);
 
   const BACKEND_URL = import.meta.env.VITE_BACKEND_URL
 
-  const getAllPapers = async ()=>{
+  const getAllPapers = async () => {
+    setLoading(true)
     const response = await axios.get(`${BACKEND_URL}/getallpapers/`)
     setPapersFetched(response.data);
-    console.log(response.data)
-    return {data:response.data}
+    // console.log(response.data)
+    setLoading(false)
+    return { data: response.data }
   }
 
-  useEffect(()=>{
-   
+  useEffect(() => {
+
     try {
       // if(isSignedIn){
       //   getAllPapers()
@@ -88,21 +91,21 @@ const Browse = () => {
     } catch (error) {
       console.log(error)
     }
-  },[BACKEND_URL,isSignedIn])
+  }, [BACKEND_URL, isSignedIn])
 
   const handleSearch = async () => {
-    if(!papersFetched){
+    if (!papersFetched) {
       //api calling
 
-     
-    }else{
+
+    } else {
       // actions on papersfetched
       setLoading(true)
-      const filter = papersFetched.filter(paper=>
+      const filter = papersFetched.filter(paper =>
         paper.subjectName.toLowerCase().includes(searchValue.toLowerCase()) ||
         paper.department.toLowerCase().includes(searchValue.toLowerCase()) ||
-        paper.examType.toLowerCase().includes(searchValue.toLowerCase()) || 
-        paper.semester.toLowerCase().includes(searchValue.toLowerCase()) 
+        paper.examType.toLowerCase().includes(searchValue.toLowerCase()) ||
+        paper.semester.toLowerCase().includes(searchValue.toLowerCase())
       )
       setPapersToDisplay(filter)
       setLoading(false)
@@ -111,17 +114,17 @@ const Browse = () => {
     }
 
   }
-  
-  const handleFilter = async ()=>{
-    if(!papersFetched){
+
+  const handleFilter = async () => {
+    if (!papersFetched) {
       //api calling
-    }else{
+    } else {
       // actions on papers fetched
 
       setLoading(true)
-      const filter = papersFetched.filter(paper=>
+      const filter = papersFetched.filter(paper =>
         paper.department.toLowerCase().includes(department.toLowerCase()) &&
-        paper.examType.toLowerCase().includes(exam.toLowerCase()) && 
+        paper.examType.toLowerCase().includes(exam.toLowerCase()) &&
         paper.semester.includes(sem)
       )
       setPapersToDisplay(filter)
@@ -178,7 +181,7 @@ const Browse = () => {
         </FormControl>
 
         <FormControl>
-        <Select
+          <Select
             labelId="semester"
             aria-placeholder='Semester'
             id="semester"
@@ -201,7 +204,7 @@ const Browse = () => {
         </FormControl>
 
         <FormControl>
-        <Select
+          <Select
             labelId="examType"
             aria-placeholder='Exam-Type'
             id="examType"
@@ -225,10 +228,18 @@ const Browse = () => {
         <Button variant='contained' onClick={handleFilter}>Search</Button>
       </form>
 
+
       <div className='mt-10 rounded-xl p-2 bg-gray-100 h-[60vh] overflow-scroll'>
-        {papersToDisplay ? <div className='flex flex-col gap-2'>
-          {papersToDisplay.map((paper)=><PaperDisplay paper={paper} key={paper.id}/>)}
-        </div> : <span className='text-gray-400 text-5xl'>Papers displayed here</span>}
+        {loading ?  <InfinitySpin
+          visible={true}
+          width="50"
+          color="##1E90FF"
+          ariaLabel="infinity-spin-loading"/> : <></>}
+        <div className={`${loading ? 'hidden' : ''}`}>
+          {papersToDisplay ? <div className='flex flex-col gap-2'>
+            {papersToDisplay.map((paper) => <PaperDisplay paper={paper} key={paper.id} />)}
+          </div> : <span className='text-gray-400 text-5xl'>Papers displayed here</span>}
+        </div>
       </div>
     </div>
   )
