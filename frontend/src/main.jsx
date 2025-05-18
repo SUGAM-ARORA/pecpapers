@@ -2,7 +2,7 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'
 import App from './App.jsx'
-import {createBrowserRouter, RouterProvider} from 'react-router-dom'
+import {createBrowserRouter, Navigate, RouterProvider, useNavigate} from 'react-router-dom'
 import Login from './Components/Login.jsx'
 import { ClerkProvider } from '@clerk/clerk-react'
 import Browse from './Pages/Browse.jsx'
@@ -28,6 +28,10 @@ const router = createBrowserRouter([
   {
     path: '/login',
     element : <Login/>
+  },
+  {
+    path: '/sso-callback',
+    element: <Navigate to="/" replace />
   }
 ])
 
@@ -40,7 +44,7 @@ if (!PUBLISHABLE_KEY) {
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <AppProvider>
-    <ClerkProvider publishableKey={PUBLISHABLE_KEY}>
+    <ClerkProvider publishableKey={PUBLISHABLE_KEY} frontendApt="https://sweeping-bobcat-34.clerk.accounts.dev" >
     <RouterProvider router={router}/>
     </ClerkProvider>
     </AppProvider>
