@@ -57,7 +57,7 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 
 const Browse = () => {
 
-  const {isSignedIn} = useUser()
+  // const {isSignedIn} = useUser()
   const [loading,setLoading] = useState(false)
 
   const [searchValue, setSearchValue] = useState('');
@@ -81,9 +81,10 @@ const Browse = () => {
   useEffect(()=>{
    
     try {
-      if(isSignedIn){
-        getAllPapers()
-      }
+      // if(isSignedIn){
+      //   getAllPapers()
+      // }
+      getAllPapers()
     } catch (error) {
       console.log(error)
     }
