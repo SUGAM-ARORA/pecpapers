@@ -181,7 +181,7 @@ export default function FormDialog() {
           </FormControl>
           {loading && <InfinitySpin
   visible={true}
-  width="200"
+  width="100"
   color="#4fa94d"
   ariaLabel="infinity-spin-loading"/>}
 

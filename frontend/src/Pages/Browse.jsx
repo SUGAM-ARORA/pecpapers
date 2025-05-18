@@ -7,7 +7,7 @@ import { departments, examType } from '../utils/constants';
 import axios from 'axios';
 import PaperDisplay from '../Components/PaperDisplay';
 import { useUser } from '@clerk/clerk-react';
-import {InfinitySpin} from 'react-loader-spinner'
+import {ColorRing} from 'react-loader-spinner'
 
 const Search = styled('div')(({ theme }) => ({
   position: 'relative',
@@ -230,16 +230,19 @@ const Browse = () => {
 
 
       <div className='mt-10 rounded-xl p-2 bg-gray-100 h-[60vh] overflow-scroll'>
-        {loading ?  <InfinitySpin
+        {loading ?  <div className='h-full flex flex-col justify-center items-center'>
+          <ColorRing
           visible={true}
-          width="50"
-          color="##1E90FF"
-          ariaLabel="infinity-spin-loading"/> : <></>}
+          width="100"
+          colors={['#e15b64', '#f47e60', '#f8b26a', '#abbd81', '#849b87']}
+          ariaLabel="infinity-spin-loading"/>
+        </div> : <></>}
         <div className={`${loading ? 'hidden' : ''}`}>
           {papersToDisplay ? <div className='flex flex-col gap-2'>
             {papersToDisplay.map((paper) => <PaperDisplay paper={paper} key={paper.id} />)}
           </div> : <span className='text-gray-400 text-5xl'>Papers displayed here</span>}
         </div>
+       
       </div>
     </div>
   )
