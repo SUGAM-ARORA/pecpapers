@@ -13,7 +13,7 @@ import ProtectedRoute from './Components/ProtectedRoute.jsx'
 const router = createBrowserRouter([
   {
     path : '/',
-    element : <ProtectedRoute><App/></ProtectedRoute>,
+    element : <App/>,
     children: [{
       path : '/browse',
       element: <Browse/>
