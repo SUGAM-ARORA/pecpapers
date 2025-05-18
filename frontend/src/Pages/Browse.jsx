@@ -57,7 +57,7 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 
 const Browse = () => {
 
-  // const {isSignedIn} = useUser()
+  const {isSignedIn} = useUser()
   const [loading,setLoading] = useState(false)
 
   const [searchValue, setSearchValue] = useState('');
