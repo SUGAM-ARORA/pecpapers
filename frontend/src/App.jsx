@@ -29,7 +29,7 @@ const App = () => {
         <FormDialog />
       </div>
       <div>
-        <Footer/>
+        {/* <Footer/> */}
       </div>
     </div>
   )
