@@ -136,7 +136,7 @@ const Browse = () => {
 
   return (
     <div className='flex flex-col m-5'>
-      <span className='text-4xl font-semibold'>Find you paper here</span>
+      <span className='text-4xl font-semibold'>Find your paper here</span>
 
       <div id='search' className='flex flex-row mt-4 '>
         <Search sx={{
