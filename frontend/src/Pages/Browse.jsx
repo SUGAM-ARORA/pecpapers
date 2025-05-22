@@ -154,7 +154,7 @@ const Browse = () => {
             onChange={(e) => setSearchValue(e.target.value)}
           />
         </Search>
-        <Button variant='contained' onClick={handleSearch}>Search</Button>
+        <Button variant='contained' onClick={handleSearch} disabled={loading}>Search</Button>
       </div>
 
       <form id='filters' className=' mt-3 flex flex-row gap-2 ml-5' onSubmit={handleFilter}>
@@ -225,7 +225,7 @@ const Browse = () => {
           </Select>
         </FormControl>
 
-        <Button variant='contained' onClick={handleFilter}>Search</Button>
+        <Button variant='contained' onClick={handleFilter} disabled={loading}>Search</Button>
       </form>
 
 
