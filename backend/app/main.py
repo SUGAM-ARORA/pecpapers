@@ -39,9 +39,9 @@ class PaperResponse(BaseModel):
     examType:str
     comments:str
 
-@app.get('/')
+@app.get('/healthz')
 def home_route():
-    return {"mesage" : "Hi"}
+    return {"status" : "healthy"}
 
 @app.post('/upload-paper')
 def upload_paper(payload:UploadRequest):
