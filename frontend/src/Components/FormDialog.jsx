@@ -6,28 +6,27 @@ import DialogActions from '@mui/material/DialogActions';
 import { FormControl, Typography, InputLabel, Select, MenuItem } from '@mui/material';
 import { departments, examType } from '../utils/constants';
 import axios from 'axios'
-import {InfinitySpin} from 'react-loader-spinner'
+import { InfinitySpin } from 'react-loader-spinner'
 import { AppContext } from '../context/AppContext';
 import Toast from './Toast';
 
 export default function FormDialog() {
-
-  const {open,setOpen} = React.useContext(AppContext)
-  const [loading,setLoading] = React.useState(false)
+  const { open, setOpen } = React.useContext(AppContext)
+  const [loading, setLoading] = React.useState(false)
   const [files, setFiles] = React.useState('')
 
-  const semesters = [1,2,3,4,5,6,7,8]
+  const semesters = [1, 2, 3, 4, 5, 6, 7, 8]
 
   const [department, setDepartment] = React.useState('')
   const [exam, setExam] = React.useState('')
-  const [sem,setSem] = React.useState('')
+  const [sem, setSem] = React.useState('')
 
   const CLOUDINARY_URL = import.meta.env.VITE_APP_CLOUDINARY_URL
   const UPLOAD_PRESET = import.meta.env.VITE_APP_UPLOAD_PRESET
   const CLOUD_NAME = import.meta.env.VITE_APP_CLOUD_NAME
   const BACKEND_URL = import.meta.env.VITE_BACKEND_URL
 
-  const [opentoast,setOpenToast] = React.useState(false)
+  const [opentoast, setOpenToast] = React.useState(false)
 
   const handleFileChange = (e) => {
     const filename = e.target.files;
@@ -36,56 +35,67 @@ export default function FormDialog() {
     }
   }
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true)
-    
-    const urlList = [];
+  const uploadImages = async (files) => {
+    const uploadPromises = Array.from(files).map(file => {
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("upload_preset", UPLOAD_PRESET);
+      formData.append("cloud_name", CLOUD_NAME);
+      return axios.post(CLOUDINARY_URL, formData);
+    });
 
-    console.log(e)
     try {
-      for (const file of files) {
-        const formData = new FormData()
-        formData.append("file", file);
-        formData.append("upload_preset", UPLOAD_PRESET);
-        formData.append("cloud_name",CLOUD_NAME)
+      const responses = await Promise.all(uploadPromises);
+      const urlList = responses.map(res => res.data.secure_url);
+      console.log(urlList.length + " images uploaded");
+      return urlList;
+    }
+    catch (error) {
+      console.error("Cloudinary image uploads failed:", error);
+      throw error;
+    }
+  };
 
-        const response = await axios.post(CLOUDINARY_URL,formData)
-        const cloudinaryUrl = response.data.secure_url;
-        urlList.push(cloudinaryUrl);
-      }
-
+  const uploadPaperDetails = async(e, urlList) => {
+    try {
       const paperDetails = {
-        department : e.target[0].value,
-        cloudUrl : urlList,
-        examType : e.target[2].value,
-        semester : e.target[4].value,
-        subjectName : e.target[6].value,
+        department: e.target[0].value,
+        cloudUrl: urlList,
+        examType: e.target[2].value,
+        semester: e.target[4].value,
+        subjectName: e.target[6].value,
         comments: e.target[9].value
       }
 
-      const dataRes = await axios.post(`${BACKEND_URL}/upload-paper/`,{data:paperDetails})
-      console.log(dataRes);
-
-      e.target.reset()
-      setDepartment('')
-      setExam('')
-      setSem('')
-      setLoading(false)
-      setOpen(false)
-      setOpenToast(true)
+      const dataRes = await axios.post(`${BACKEND_URL}/upload-paper/`, { data: paperDetails })
+      console.log("Paper details uploaded successfully");
     }
     catch (error) {
-      console.error("Upload failed", error);
+      console.error("Paper details upload failed", error);
     }
   }
 
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true)
+
+    const urlList = await uploadImages(files);
+    await uploadPaperDetails(e, urlList);
+
+    e.target.reset()
+    setDepartment('')
+    setExam('')
+    setSem('')
+    setLoading(false)
+    setOpen(false)
+    setOpenToast(true)
+  }
 
   const handleClose = () => {
     setOpen(false);
   };
 
-  const handleUpload = async ()=>{
+  const handleUpload = async () => {
 
   }
 
@@ -155,7 +165,7 @@ export default function FormDialog() {
                 value={sem}
                 onChange={(e) => setSem(e.target.value)}
               >
-               {semesters.map((sem)=><MenuItem value={sem}>{sem}</MenuItem>)}
+                {semesters.map((sem) => <MenuItem value={sem}>{sem}</MenuItem>)}
               </Select>
             </div>
           </FormControl>
@@ -163,7 +173,7 @@ export default function FormDialog() {
           <FormControl>
             <div>
               <Typography>Subject Name</Typography>
-              <TextField 
+              <TextField
                 sx={{ width: '50vh', height: '5vh' }}
                 required="true"
               >
@@ -194,10 +204,10 @@ export default function FormDialog() {
             </div>
           </FormControl>
           {loading && <InfinitySpin
-  visible={true}
-  width="100"
-  color="#4fa94d"
-  ariaLabel="infinity-spin-loading"/>}
+            visible={true}
+            width="100"
+            color="#4fa94d"
+            ariaLabel="infinity-spin-loading" />}
 
           <DialogActions>
             <Button onClick={handleClose}>Cancel</Button>
@@ -205,7 +215,7 @@ export default function FormDialog() {
           </DialogActions>
         </form>
       </Dialog>
-      <Toast opentoast={opentoast} setOpenToast={setOpenToast} message="Paper Upload"/>
+      <Toast opentoast={opentoast} setOpenToast={setOpenToast} message="Paper Upload" />
     </>
   );
 }
