@@ -19,7 +19,7 @@ app.add_middleware(
 class PaperData(BaseModel):
     semester : str
     department:str
-    cloudUrl:str
+    cloudUrl:list[str]
     subjectName:str
     examType:str
     comments:str
@@ -34,7 +34,7 @@ class PaperResponse(BaseModel):
     id:int
     semester : str
     department:str
-    cloudUrl:str
+    cloudUrl:list[str]
     subjectName:str
     examType:str
     comments:str
@@ -58,8 +58,36 @@ def upload_paper(payload:UploadRequest):
         }
 
 @app.get('/papersonfilter')
-def get_papers_on_filter():
-    return {}
+def get_papers_on_filter(
+    semester: Optional[str] = Query(None),
+    department: Optional[str] = Query(None),
+    subjectName: Optional[str] = Query(None),
+    examType: Optional[str] = Query(None)
+):
+    try:
+        papers_ref = db.collection("papers")
+
+        if semester:
+            papers_ref = papers_ref.where("semester", "==", semester)
+        if department:
+            papers_ref = papers_ref.where("department", "==", department.upper())
+        if examType:
+            papers_ref = papers_ref.where("examType", "==", examType.upper())
+
+        docs = papers_ref.stream()
+
+        papers = []
+        for doc in docs:
+            if subjectName and subjectName.lower() not in doc.to_dict().get("subjectName", "").lower():
+                continue
+            paper_data = doc.to_dict()
+            paper_data["id"] = doc.id
+            papers.append(paper_data)
+
+        return papers
+    except Exception as e:
+        print(e)
+        return JSONResponse(status_code=500, content={"Error": str(e)})
 
 @app.post('/papersonsearch')
 def get_papers_on_search(data:SearchRequest):
