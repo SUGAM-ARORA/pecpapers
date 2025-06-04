@@ -3,6 +3,8 @@ import { IoMdDownload } from "react-icons/io";
 import { FaEye } from "react-icons/fa";
 import Modal from 'react-modal';
 import Slider from 'react-slick';
+import JSZip from "jszip";
+import { saveAs } from "file-saver";
 
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
@@ -27,6 +29,28 @@ const PrevArrow = (props) => {
     )
 };
 
+const downloadImagesAsZip = async (paper) => {
+    const zip = new JSZip();
+    const folder = zip.folder("images");
+
+    const imageUrls = paper.cloudUrl;
+    const zipFileName = `${paper.semester}th_sem_${paper.subjectName}_${paper.examType}.zip`;
+
+    for (const i in imageUrls) {
+        const url = imageUrls[i];
+        try {
+            const response = await fetch(url);
+            const blob = await response.blob();
+            folder.file(`image_${i}.jpg`, blob);
+        }
+        catch (error) {
+            console.error(`Failed to fetch image ${url}`, error);
+        }
+    }
+
+    const zipBlob = await zip.generateAsync({ type: "blob" });
+    saveAs(zipBlob, zipFileName);
+};
 
 const PaperDisplay = ({ paper }) => {
     const [modalOpen, setModalOpen] = useState(false);
@@ -55,9 +79,11 @@ const PaperDisplay = ({ paper }) => {
             </div>
 
             <div className='flex flex-row gap-2 mt-2'>
-                <a href={paper.cloudUrl} download={`${paper.semester}th sem ${paper.subjectName} ${paper.examType}`} target='_blank' rel="noopener noreferrer">
-                    <IoMdDownload size={25} />
-                </a>
+                <IoMdDownload
+                    size={25}
+                    style={{ cursor: "pointer" }}
+                    onClick={() => downloadImagesAsZip(paper)}
+                />
                 <div onClick={() => setModalOpen(true)} className='cursor-pointer'>
                     <FaEye size={25} />
                 </div>
@@ -82,10 +108,10 @@ const PaperDisplay = ({ paper }) => {
                 }}
                 ariaHideApp={false}
             >
-                <div style={{width: "100%"}}>
+                <div style={{ width: "100%" }}>
                     <Slider {...sliderSettings}>
                         {images.map((url, index) => (
-                            <div key={index} style={{height: "80vh", display:'flex', alignItems:'center'}}>
+                            <div key={index} style={{ height: "80vh", display: 'flex', alignItems: 'center' }}>
                                 <img
                                     src={url}
                                     alt={`Slide ${index}`}
