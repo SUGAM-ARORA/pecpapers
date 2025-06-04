@@ -10,21 +10,21 @@ import "slick-carousel/slick/slick-theme.css";
 import { FaArrowLeft, FaArrowRight } from "react-icons/fa";
 
 const NextArrow = (props) => {
-      const { className, style, onClick } = props;
-      return(
+    const { className, style, onClick } = props;
+    return (
         <div onClick={onClick} className={`arrow ${className}`} >
-          <FaArrowRight class="arrows" style={{color:"white"}}/>
+            <FaArrowRight class="arrows" style={{ color: "white" }} />
         </div>
-      )
+    )
 };
 
 const PrevArrow = (props) => {
-      const { className, style, onClick } = props;
-      return(
+    const { className, style, onClick } = props;
+    return (
         <div onClick={onClick} className={`arrow ${className}`} >
-          <FaArrowLeft class="arrows" style={{color:"white"}}/>
+            <FaArrowLeft class="arrows" style={{ color: "white" }} />
         </div>
-      )
+    )
 };
 
 
@@ -48,7 +48,7 @@ const PaperDisplay = ({ paper }) => {
         <div className='bg-gray-200 flex flex-row p-2 justify-between rounded-lg'>
             <div className='flex flex-col'>
                 <div className='flex flex-row gap-2'>
-                    <img src={paper.cloudUrl} alt="paper" className='h-12 w-12' />
+                    <img src={Array.isArray(paper.cloudUrl) ? paper.cloudUrl[0] : paper.cloudUrl} alt="paper" className='h-12 w-12' />
                     <span className='font-semibold mt-2'>{paper.semester}th sem {paper.subjectName} {paper.examType}</span>
                 </div>
                 <span className='ml-[7vh]'>Comments : {paper.comments}</span>
@@ -58,9 +58,9 @@ const PaperDisplay = ({ paper }) => {
                 <a href={paper.cloudUrl} download={`${paper.semester}th sem ${paper.subjectName} ${paper.examType}`} target='_blank' rel="noopener noreferrer">
                     <IoMdDownload size={25} />
                 </a>
-                <a onClick={() => setModalOpen(true)}>
+                <div onClick={() => setModalOpen(true)} className='cursor-pointer'>
                     <FaEye size={25} />
-                </a>
+                </div>
             </div>
 
             <Modal
@@ -75,22 +75,32 @@ const PaperDisplay = ({ paper }) => {
                         padding: 0,
                         background: 'white',
                         overflow: 'hidden',
+                        display: 'flex',
+                        alignItems: 'center'
                     },
-                    
+
                 }}
                 ariaHideApp={false}
             >
-                <Slider {...sliderSettings}>
-                    {images.map((url, index) => (
-                        <div key={index}>
-                            <img
-                                src={url}
-                                alt={`Slide ${index}`}
-                                style={{ width: '100%', maxHeight: '80vh', objectFit: 'contain' }}
-                            />
-                        </div>
-                    ))}
-                </Slider>
+                <div style={{width: "100%"}}>
+                    <Slider {...sliderSettings}>
+                        {images.map((url, index) => (
+                            <div key={index} style={{height: "80vh", display:'flex', alignItems:'center'}}>
+                                <img
+                                    src={url}
+                                    alt={`Slide ${index}`}
+                                    style={{
+                                        maxWidth: '100%',
+                                        maxHeight: '80vh',
+                                        objectFit: 'contain',
+                                        display: 'block',
+                                        margin: '0 auto',
+                                    }}
+                                />
+                            </div>
+                        ))}
+                    </Slider>
+                </div>
             </Modal>
         </div>
     );
