@@ -6,22 +6,23 @@ import Slider from 'react-slick';
 import JSZip from "jszip";
 import { saveAs } from "file-saver";
 
-import "slick-carousel/slick/slick.css";
-import "slick-carousel/slick/slick-theme.css";
+// import "slick-carousel/slick/slick.css";
+// import "slick-carousel/slick/slick-theme.css";
 
 import { FaArrowLeft, FaArrowRight } from "react-icons/fa";
 
 const NextArrow = (props) => {
-    const { className, style, onClick } = props;
+    const { className,  onClick } = props;
     return (
         <div onClick={onClick} className={`arrow ${className}`} >
+            {console.log(`arrow ${className}`)}
             <FaArrowRight class="arrows" style={{ color: "white" }} />
         </div>
     )
 };
 
 const PrevArrow = (props) => {
-    const { className, style, onClick } = props;
+    const { className, onClick } = props;
     return (
         <div onClick={onClick} className={`arrow ${className}`} >
             <FaArrowLeft class="arrows" style={{ color: "white" }} />
@@ -56,7 +57,7 @@ const PaperDisplay = ({ paper }) => {
     const [modalOpen, setModalOpen] = useState(false);
 
     const sliderSettings = {
-        dots: true,
+        dots: false,
         arrows: true,
         infinite: false,
         speed: 500,
@@ -111,7 +112,7 @@ const PaperDisplay = ({ paper }) => {
                 <div style={{ width: "100%" }}>
                     <Slider {...sliderSettings}>
                         {images.map((url, index) => (
-                            <div key={index} style={{ height: "80vh", display: 'flex', alignItems: 'center' }}>
+                            <div key={index} style={{ height: "70vh", display: 'flex', alignItems: 'center' }}>
                                 <img
                                     src={url}
                                     alt={`Slide ${index}`}
