@@ -5,7 +5,6 @@ from app.database import db
 from fastapi.responses import JSONResponse
 from fastapi import HTTPException
 from typing import Optional, List
-from math import ceil
 
 app = FastAPI()
 
@@ -58,43 +57,34 @@ def upload_paper(payload:UploadRequest):
             "status_code": "400"
         }
 
-@app.get('/papersOnFilterOrSearch')
+@app.get('/papersonfilter')
 def get_papers_on_filter(
     semester: Optional[str] = Query(None),
     department: Optional[str] = Query(None),
     subjectName: Optional[str] = Query(None),
-    examType: Optional[str] = Query(None),
-    skip:int= 0,
-    limit:int=10
+    examType: Optional[str] = Query(None)
 ):
     try:
-       
-        
-        query = db.collection("papers")
+        papers_ref = db.collection("papers")
 
         if semester:
-            query = query.where("semester", "==", semester)
+            papers_ref = papers_ref.where("semester", "==", semester)
         if department:
-            query = query.where("department", "==", department.upper())
+            papers_ref = papers_ref.where("department", "==", department.upper())
         if examType:
-            query = query.where("examType", "==", examType.upper())
+            papers_ref = papers_ref.where("examType", "==", examType.upper())
 
-        docs = query.stream()
+        docs = papers_ref.stream()
+
         papers = []
-
         for doc in docs:
             if subjectName and subjectName.lower() not in doc.to_dict().get("subjectName", "").lower():
                 continue
             paper_data = doc.to_dict()
             paper_data["id"] = doc.id
             papers.append(paper_data)
-            
-        total = len(papers)
-        paginated = papers[skip:skip + limit]
-        has_more = skip+limit < total
 
-       
-        return {"total":total,"data":paginated,"has_more":has_more,"currentPage":(skip//limit)+1,"totalPages":ceil(total/limit)}
+        return papers
     except Exception as e:
         print(e)
         return JSONResponse(status_code=500, content={"Error": str(e)})

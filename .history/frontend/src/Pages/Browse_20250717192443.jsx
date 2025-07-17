@@ -7,10 +7,7 @@ import { departments, examType } from '../utils/constants';
 import axios from 'axios';
 import PaperDisplay from '../Components/PaperDisplay';
 import { useUser } from '@clerk/clerk-react';
-import { ColorRing } from 'react-loader-spinner'
-import { IoMdArrowRoundBack } from "react-icons/io";
-import { IoMdArrowRoundForward } from "react-icons/io";
-
+import {ColorRing} from 'react-loader-spinner'
 
 const Search = styled('div')(({ theme }) => ({
   position: 'relative',
@@ -70,27 +67,20 @@ const Browse = () => {
   const [sem, setSem] = React.useState('')
 
   const [papersToDisplay, setPapersToDisplay] = useState(null);
-
-  
-  const [skip,setskip] = useState(0);
-  const [limit] = useState(10);
-  const [hasMore, setHasMore] = useState(true);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
-  
+  const [papersFetched, setPapersFetched] = useState(null);
 
   const BACKEND_URL = import.meta.env.VITE_BACKEND_URL
 
-  // const getAllPapers = async () => {
-  //   setLoading(true)
-  //   const response = await axios.get(`${BACKEND_URL}/getallpapers/`)
-  //   setPapersFetched(response.data);
-  //   // console.log(response.data)
-  //   setLoading(false)
-  //   return { data: response.data }
-  // }
+  const getAllPapers = async () => {
+    setLoading(true)
+    const response = await axios.get(`${BACKEND_URL}/getallpapers/`)
+    setPapersFetched(response.data);
+    // console.log(response.data)
+    setLoading(false)
+    return { data: response.data }
+  }
 
-  const getConnectionStatus = async () => {
+  const getConnectionStatus = async ()=>{
     setLoading(true)
     const response = await axios.get(`${BACKEND_URL}/healthz/`)
     setLoading(false)
@@ -98,33 +88,13 @@ const Browse = () => {
     return response.data;
   }
 
-  const handleNext = async ()=>{
-   if(hasMore){
-    const newSkip = skip+limit  
-    setskip(newSkip)
-    await getFilteredPapers()
-  }
-  }
-
-    const handlePrev = async ()=>{
-      if(skip>=limit){
-        const newSkip = skip-limit
-        setskip(newSkip)
-        await getFilteredPapers()
-      }
-  }
-
-  const getFilteredPapers = async () => {
+  const getFilteredPapers = async ()=>{
     try {
       setLoading(true)
-
-      const response = await axios.get(`${BACKEND_URL}/papersOnFilterOrSearch?subjectName=${searchValue}&semester=${sem}&department=${department}&examType=${exam}&skip=${skip}`)
-
+      const response = await axios.get(`${BACKEND_URL}/papersOnFilterOrSearch?subjectName=${searchValue}&semester=${sem}&department=${department}&examType=${exam}`)
+      console.log(response.data)
+      setPapersFetched(response.data.data)
       setPapersToDisplay(response.data.data)
-      setCurrentPage(response.data.currentPage)
-      setHasMore(response.data.has_more)
-      setTotalPages(response.data.totalPages)
-
       setLoading(false)
     } catch (error) {
       setLoading(false)
@@ -145,6 +115,46 @@ const Browse = () => {
     }
   }, [BACKEND_URL, isSignedIn])
 
+  const handleSearch = async () => {
+    if (!papersFetched) {
+      //api calling
+
+
+    } else {
+      // actions on papersfetched
+      setLoading(true)
+      const filter = papersFetched.filter(paper =>
+        paper.subjectName.toLowerCase().includes(searchValue.toLowerCase()) ||
+        paper.department.toLowerCase().includes(searchValue.toLowerCase()) ||
+        paper.examType.toLowerCase().includes(searchValue.toLowerCase()) ||
+        paper.semester.toLowerCase().includes(searchValue.toLowerCase())
+      )
+      setPapersToDisplay(filter)
+      setLoading(false)
+      // console.log(filter)
+      return;
+    }
+
+  }
+
+  const handleFilter = async () => {
+    if (!papersFetched) {
+      //api calling
+    } else {
+      // actions on papers fetched
+
+      setLoading(true)
+      const filter = papersFetched.filter(paper =>
+        paper.department.toLowerCase().includes(department.toLowerCase()) &&
+        paper.examType.toLowerCase().includes(exam.toLowerCase()) &&
+        paper.semester.includes(sem)
+      )
+      setPapersToDisplay(filter)
+      setLoading(false)
+      // console.log(filter)
+      return
+    }
+  }
 
   return (
     <div className='flex flex-col m-5'>
@@ -169,7 +179,7 @@ const Browse = () => {
         <Button variant='contained' onClick={getFilteredPapers} disabled={loading}>Search</Button>
       </div>
 
-      <form id='filters' className=' mt-3 flex flex-row gap-2 ml-5' onSubmit={getFilteredPapers}>
+      <form id='filters' className=' mt-3 flex flex-row gap-2 ml-5' onSubmit={handleFilter}>
         <FormControl>
           <Select
             labelId="department"
@@ -233,7 +243,7 @@ const Browse = () => {
             <MenuItem value="" disabled>
               Exam Type
             </MenuItem>
-            {examType.map((exam, index) => <MenuItem value={exam.type} key={index}>{exam.type}</MenuItem>)}
+            {examType.map((exam,index) => <MenuItem value={exam.type} key={index}>{exam.type}</MenuItem>)}
           </Select>
         </FormControl>
 
@@ -242,31 +252,25 @@ const Browse = () => {
 
 
       <div className='mt-10 rounded-xl p-2 bg-gray-100 h-[60vh] overflow-scroll'>
-        {loading ? <div className='h-full flex flex-col justify-center items-center'>
+        {loading ?  <div className='h-full flex flex-col justify-center items-center'>
           <ColorRing
-            visible={true}
-            width="100"
-            colors={['#e15b64', '#f47e60', '#f8b26a', '#abbd81', '#849b87']}
-            ariaLabel="infinity-spin-loading" />
+          visible={true}
+          width="100"
+          colors={['#e15b64', '#f47e60', '#f8b26a', '#abbd81', '#849b87']}
+          ariaLabel="infinity-spin-loading"/>
         </div> : <></>}
         <div className={`${loading ? 'hidden' : ''}`}>
           {papersToDisplay ? <div className='flex flex-col gap-2'>
             {papersToDisplay.map((paper) => <PaperDisplay paper={paper} key={paper.id} />)}
           </div> : <span className='text-gray-400 text-5xl'>Papers displayed here</span>}
         </div>
-
+       
       </div>
       <div className=' w-full mt-1 flex items-center justify-center'>
         <div className='flex flex-row gap-2'>
-          <Button variant='contained' onClick={handlePrev} disabled={loading}>
-            <IoMdArrowRoundBack />
-          </Button>
-          <span className=' bg-gray-100 p-1'>
-            {currentPage} / {totalPages}
-          </span>
-          <Button variant='contained' onClick={handleNext} disabled={loading || !hasMore}>
-            <IoMdArrowRoundForward />
-          </Button>
+          <Button variant='contained' onClick={getFilteredPapers} disabled={loading}></Button>
+          <span className='border-2 border-black bg-gray-100 p-1'>2/4</span>
+           <Button variant='contained' onClick={getFilteredPapers} disabled={loading}></Button>
         </div>
       </div>
     </div>

@@ -5,7 +5,6 @@ from app.database import db
 from fastapi.responses import JSONResponse
 from fastapi import HTTPException
 from typing import Optional, List
-from math import ceil
 
 app = FastAPI()
 
@@ -91,10 +90,7 @@ def get_papers_on_filter(
             
         total = len(papers)
         paginated = papers[skip:skip + limit]
-        has_more = skip+limit < total
-
-       
-        return {"total":total,"data":paginated,"has_more":has_more,"currentPage":(skip//limit)+1,"totalPages":ceil(total/limit)}
+        return {"total":total,"data":paginated}
     except Exception as e:
         print(e)
         return JSONResponse(status_code=500, content={"Error": str(e)})

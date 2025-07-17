@@ -5,7 +5,6 @@ from app.database import db
 from fastapi.responses import JSONResponse
 from fastapi import HTTPException
 from typing import Optional, List
-from math import ceil
 
 app = FastAPI()
 
@@ -68,16 +67,16 @@ def get_papers_on_filter(
     limit:int=10
 ):
     try:
-       
-        
-        query = db.collection("papers")
+        print(semester,department,subjectName,examType)
+        papers_ref = db.collection("papers")
+        query = papers_ref
 
         if semester:
-            query = query.where("semester", "==", semester)
+            papers_ref = query.where("semester", "==", semester)
         if department:
-            query = query.where("department", "==", department.upper())
+            papers_ref = query.where("department", "==", department.upper())
         if examType:
-            query = query.where("examType", "==", examType.upper())
+            papers_ref = query.where("examType", "==", examType.upper())
 
         docs = query.stream()
         papers = []
@@ -91,10 +90,7 @@ def get_papers_on_filter(
             
         total = len(papers)
         paginated = papers[skip:skip + limit]
-        has_more = skip+limit < total
-
-       
-        return {"total":total,"data":paginated,"has_more":has_more,"currentPage":(skip//limit)+1,"totalPages":ceil(total/limit)}
+        return {"total":total,"data":paginated}
     except Exception as e:
         print(e)
         return JSONResponse(status_code=500, content={"Error": str(e)})
