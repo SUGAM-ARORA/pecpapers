@@ -109,7 +109,7 @@ export default function FormDialog() {
           <FormControl>
             <Typography fontSize={25} >Upload a Paper</Typography>
             <div >
-              <Typography>Department</Typography>
+              <Typography>Departments<span className='text-sm'>(Give the name of department the uploaded paper belongs to.)</span></Typography>
               <Select
                 required="true"
                 labelId="department"
