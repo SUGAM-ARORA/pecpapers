@@ -70,14 +70,10 @@ const Browse = () => {
   const [sem, setSem] = React.useState('')
 
   const [papersToDisplay, setPapersToDisplay] = useState(null);
+  const [papersFetched, setPapersFetched] = useState(null);
 
-  
+  const [totalPapers, setTotalPapers] = useState(null)
   const [skip,setskip] = useState(0);
-  const [limit] = useState(10);
-  const [hasMore, setHasMore] = useState(true);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
-  
 
   const BACKEND_URL = import.meta.env.VITE_BACKEND_URL
 
@@ -99,19 +95,18 @@ const Browse = () => {
   }
 
   const handleNext = async ()=>{
-   if(hasMore){
-    const newSkip = skip+limit  
-    setskip(newSkip)
+    const newskip = skip+10
+    setskip(newskip)
     await getFilteredPapers()
-  }
   }
 
     const handlePrev = async ()=>{
-      if(skip>=limit){
-        const newSkip = skip-limit
-        setskip(newSkip)
-        await getFilteredPapers()
+      if(skip==0){
+        return
       }
+    const newskip = skip-10
+    setskip(newskip)
+    await getFilteredPapers()
   }
 
   const getFilteredPapers = async () => {
@@ -120,10 +115,9 @@ const Browse = () => {
 
       const response = await axios.get(`${BACKEND_URL}/papersOnFilterOrSearch?subjectName=${searchValue}&semester=${sem}&department=${department}&examType=${exam}&skip=${skip}`)
 
+      setPapersFetched(response.data.data)
       setPapersToDisplay(response.data.data)
-      setCurrentPage(response.data.currentPage)
-      setHasMore(response.data.has_more)
-      setTotalPages(response.data.totalPages)
+      setTotalPapers(response.data.total)
 
       setLoading(false)
     } catch (error) {
@@ -145,6 +139,46 @@ const Browse = () => {
     }
   }, [BACKEND_URL, isSignedIn])
 
+  // const handleSearch = async () => {
+  //   if (!papersFetched) {
+  //     //api calling
+
+
+  //   } else {
+  //     // actions on papersfetched
+  //     setLoading(true)
+  //     const filter = papersFetched.filter(paper =>
+  //       paper.subjectName.toLowerCase().includes(searchValue.toLowerCase()) ||
+  //       paper.department.toLowerCase().includes(searchValue.toLowerCase()) ||
+  //       paper.examType.toLowerCase().includes(searchValue.toLowerCase()) ||
+  //       paper.semester.toLowerCase().includes(searchValue.toLowerCase())
+  //     )
+  //     setPapersToDisplay(filter)
+  //     setLoading(false)
+  //     // console.log(filter)
+  //     return;
+  //   }
+
+  // }
+
+  // const handleFilter = async () => {
+  //   if (!papersFetched) {
+  //     //api calling
+  //   } else {
+  //     // actions on papers fetched
+
+  //     setLoading(true)
+  //     const filter = papersFetched.filter(paper =>
+  //       paper.department.toLowerCase().includes(department.toLowerCase()) &&
+  //       paper.examType.toLowerCase().includes(exam.toLowerCase()) &&
+  //       paper.semester.includes(sem)
+  //     )
+  //     setPapersToDisplay(filter)
+  //     setLoading(false)
+  //     // console.log(filter)
+  //     return
+  //   }
+  // }
 
   return (
     <div className='flex flex-col m-5'>
@@ -262,9 +296,9 @@ const Browse = () => {
             <IoMdArrowRoundBack />
           </Button>
           <span className=' bg-gray-100 p-1'>
-            {currentPage} / {totalPages}
+            
           </span>
-          <Button variant='contained' onClick={handleNext} disabled={loading || !hasMore}>
+          <Button variant='contained' onClick={handleNext} disabled={loading}>
             <IoMdArrowRoundForward />
           </Button>
         </div>

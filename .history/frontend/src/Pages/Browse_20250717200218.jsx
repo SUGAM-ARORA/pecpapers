@@ -262,7 +262,7 @@ const Browse = () => {
             <IoMdArrowRoundBack />
           </Button>
           <span className=' bg-gray-100 p-1'>
-            {currentPage} / {totalPages}
+            
           </span>
           <Button variant='contained' onClick={handleNext} disabled={loading || !hasMore}>
             <IoMdArrowRoundForward />

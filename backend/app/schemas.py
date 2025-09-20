@@ -4,7 +4,7 @@ class PaperResponse(BaseModel):
     id:int
     semester : str
     department:str
-    cloudUrl:str
+    cloudUrl:list[str]
     subjectName:str
     examType:str
     comments:str

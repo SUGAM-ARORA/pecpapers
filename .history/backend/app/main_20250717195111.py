@@ -94,7 +94,7 @@ def get_papers_on_filter(
         has_more = skip+limit < total
 
        
-        return {"total":total,"data":paginated,"has_more":has_more,"currentPage":(skip//limit)+1,"totalPages":ceil(total/limit)}
+        return {"total":total,"data":paginated,"has_more":has_more,"currentPage":(skip+limit)+1,"totalPages":ceil(total/limit)}
     except Exception as e:
         print(e)
         return JSONResponse(status_code=500, content={"Error": str(e)})
